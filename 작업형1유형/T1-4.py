@@ -21,6 +21,14 @@ print('첨도 :', k1)
 
 # 'SalePrice'컬럼 로그변환
 
+df['SalePrice'] = np.log1p((df['SalePrice']))
+
 # 'SalePrice'컬럼 왜도와 첨도계산
+s2 = df['SalePrice'].skew()
+k2 = df['SalePrice'].kurt()
+print('왜도 :', s2)
+print('첨도 :', k2)
 
 # 모두 더한 다음 출력
+
+print(round(s1+s2+k1+k2, 2))
