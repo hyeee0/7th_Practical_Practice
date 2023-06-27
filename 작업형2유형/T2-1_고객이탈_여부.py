@@ -45,6 +45,44 @@ print(X_train.head())
 categorical_features = ['NumOfProducts', 'HasCrCard', 'IsActiveMember']
 
 for feature in categorical_features:
-    X_train[feature] = X_train[feature].astype('c')
+    X_train[feature] = X_train[feature].astype('category')
+    X_test[feature] = X_test[feature].astype('category')
 
+X_train = pd.get_dummies(X_train)
+X_test = pd.get_dummies(X_test)
 
+print(X_test.head())
+
+#6. 파생변수 변경(5계층으로 범주화)
+# X_train['CreditScore'].value_counts()
+# pd.qcut : 같은 갯수로 구간 나누기
+# pd.cut : 같은 길이로 구간 나누기
+
+X_train['CreditScore_qcut'] = pd.qcut(X_train['CreditScore'], 5, labels=False)
+X_test['CreditScore_qcut'] = pd.qcut(X_test['CreditScore'], 5, labels=False)
+
+# 7. 수치데이터 정규화(Standardization) 스케일링 CreditScore, Balance, EstimatedSalary
+
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.fit_transform(X_test)
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train.iloc[:, 1], random_state=2022,
+                                                      stratify=y_train.iloc[:, 1])
+
+# 8. 모델링
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import VotingClassifier
+
+model1 = LogisticRegression()
+model1.fit(X_train, y_train)
+predicted1 = model1.predict_proba(X_valid)
