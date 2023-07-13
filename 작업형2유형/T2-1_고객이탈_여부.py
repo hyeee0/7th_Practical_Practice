@@ -86,3 +86,68 @@ from sklearn.ensemble import VotingClassifier
 model1 = LogisticRegression()
 model1.fit(X_train, y_train)
 predicted1 = model1.predict_proba(X_valid)
+
+model2 = RandomForestClassifier()
+model2.fit(X_train, y_train)
+predicted2 = model2.predict_proba(X_valid)
+
+model3 = DecisionTreeClassifier()
+model3.fit(X_train, y_train)
+predicted3 = model3.predict_proba(X_valid)
+
+model4 = VotingClassifier(estimators= [('logistic', model1), ('random', model2)], voting='soft')
+model4.fit(X_train, y_train)
+predicted4 = model4.predict_proba(X_valid)
+
+print(y_valid.shape, predicted1.shape, predicted2.shape, predicted3.shape)
+
+# 9. 모델링 평가
+from sklearn.metrics import roc_auc_score
+print('로지스틱 회귀분석 점수 : {}'.format(roc_auc_score(y_valid, predicted1[:, 1])))
+print('랜덤포레스트 회귀분석 점수 : {}'.format(roc_auc_score(y_valid, predicted2[:, 1])))
+print('의사결정나무 회귀분석 점수 : {}'.format(roc_auc_score(y_valid, predicted3[:, 1])))
+print('앙상블 보팅 회귀분석 점수 : {}'.format(roc_auc_score(y_valid, predicted4[:, 1])))
+
+# 10. GridSearchCV 적용(최상의 모델을 찾은 후 최종 모델을 훈련)
+from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'n_estimators': [50, 100, 150],
+    'max_depth': [5, 7],
+}
+
+gs = GridSearchCV(estimator = RandomForestClassifier(), param_grid= param_grid, cv = 10)
+gs.fit(X_train, y_train)
+print(gs.best_params_)
+
+# 11. 적합한 하이퍼파라미터 설정 후 평가
+model5 = RandomForestClassifier(max_depth=7 , n_estimators=150)
+model5.fit(X_train, y_train)
+predicted5 = model5.predict_proba(X_valid)
+
+print('로지스틱 회귀분석 점수 : {}'.format(roc_auc_score(y_valid, predicted1[:, 1])))
+print('랜덤포레스트 회귀분석 점수 : {}'.format(roc_auc_score(y_valid, predicted2[:, 1])))
+print('의사결정나무 회귀분석 점수 : {}'.format(roc_auc_score(y_valid, predicted3[:, 1])))
+print('앙상블 보팅 회귀분석 점수 : {}'.format(roc_auc_score(y_valid, predicted4[:, 1])))
+print('GridSearchCV 적용 랜덤포레스트 점수 : {}'.format(roc_auc_score(y_valid, predicted5[:, 1])))
+
+print(X_test_id.shape)
+
+# 12. 최종 예측 모델 적용 후 평가
+model6 = RandomForestClassifier(max_depth=7, n_estimators=150)
+model6.fit(X_train, y_train)
+predicted6 = model6.predict_proba(X_test)
+
+result = pd.DataFrame({'CustomerID' : X_test_id, 'Exited' : predicted6[:, 1]})
+result.to_csv('y_test.csv', index=False)
+
+
+def result_validate(result):
+    y_test = pd.read_csv('../Data/T2/test_label/y_test.csv')
+    expected = y_test['Exited']
+    predicted = result['Exited']
+
+    print('ROC AUC score : ', roc_auc_score(expected, predicted))
+
+
+result_validate(result)
