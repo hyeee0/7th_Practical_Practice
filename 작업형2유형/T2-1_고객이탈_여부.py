@@ -3,9 +3,9 @@ import numpy as np
 
 # 1. 데이터 load
 
-X_train = pd.read_csv('../Data/T2/X_train.csv')
-y_train = pd.read_csv('../Data/T2/y_train.csv')
-X_test = pd.read_csv('../Data/T2/X_test.csv')
+X_train = pd.read_csv('../Data/T2/T2-1/X_train.csv')
+y_train = pd.read_csv('../Data/T2/T2-1/y_train.csv')
+X_test = pd.read_csv('../Data/T2/T2-1/X_test.csv')
 
 print(X_train.head())
 
@@ -143,7 +143,7 @@ result.to_csv('y_test.csv', index=False)
 
 
 def result_validate(result):
-    y_test = pd.read_csv('../Data/T2/test_label/y_test.csv')
+    y_test = pd.read_csv('../Data/T2/T2-1/test_label/y_test.csv')
     expected = y_test['Exited']
     predicted = result['Exited']
 
