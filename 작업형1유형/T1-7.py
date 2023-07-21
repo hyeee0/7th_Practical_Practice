@@ -7,7 +7,7 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv('./Data/T1-7.csv')
+df = pd.read_csv('../Data/T1-7.csv')
 
 # 값 변경하기
 df['f4'] = df['f4'].replace('ESFJ', 'ISFJ')
